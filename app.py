@@ -49,14 +49,15 @@ if not st.session_state.logged_in:
 
         if st.button("Login"):
 
-            if email == "admin@gmail.com" and password == "1234":
+           if "@" in email and "." in email and len(password) >= 4:
 
-                st.session_state.logged_in = True
-                st.rerun()
+              st.session_state.logged_in = True
+              st.session_state.email = email
+              st.rerun()
 
-            else:
+           else:
 
-                st.error("Invalid Email or Password")
+             st.error("Please enter a valid email and password.")
 
 # ---------------- DASHBOARD ----------------
 # ---------------- DASHBOARD ----------------
