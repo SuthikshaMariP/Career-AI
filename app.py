@@ -80,38 +80,128 @@ else:
     )
 
     # Dashboard Page
-    if page == "🏠 Dashboard":
-       
-        st.title("🏠 CareerAI Dashboard")
+# =====================================================
+# DASHBOARD
+# =====================================================
 
-        col1, col2, col3 = st.columns(3)
+if page == "🏠 Dashboard":
 
-        with col1:
-            st.metric("Resume Score", "82%")
+    st.title("🏠 CareerAI Dashboard")
 
-        with col2:
-            st.metric("Career Readiness", "74%")
+    # Check whether a resume has been uploaded
+    resume_uploaded = bool(
+        st.session_state.resume_text.strip()
+    )
 
-        with col3:
-            st.metric("Internships", "15")
-        st.markdown("---")
+    # -----------------------------------------
+    # BEFORE RESUME UPLOAD
+    # -----------------------------------------
 
-        st.subheader("Welcome to CareerAI")
+    if not resume_uploaded:
 
-        st.write("""
-        CareerAI helps students to:
+        score = 0
+        readiness = 0
+        internship_count = 0
 
-        ✅ Upload Resume
+    # -----------------------------------------
+    # AFTER RESUME UPLOAD
+    # -----------------------------------------
 
-        ✅ Get AI Internship Recommendation
+    else:
 
-        ✅ Analyze Skill Gap
+        # Resume score calculated from uploaded resume
+        score = st.session_state.resume_score
 
-        ✅ Generate Career Roadmap
+        # Career readiness based on resume score
+        if score >= 80:
+            readiness = 80
+        elif score >= 60:
+            readiness = 65
+        elif score > 0:
+            readiness = 45
+        else:
+            readiness = 0
 
-        ✅ Improve Career Readiness
-        """)
+        # Count internships that match at least one skill
+        internship_count = 0
 
+        try:
+
+            data = pd.read_csv("internships.csv")
+
+            for _, row in data.iterrows():
+
+                required_skills = str(
+                    row["Skills"]
+                ).split(",")
+
+                required_skills = [
+                    skill.strip()
+                    for skill in required_skills
+                ]
+
+                matched = any(
+                    required.lower() == user_skill.lower()
+                    for required in required_skills
+                    for user_skill in st.session_state.found_skills
+                )
+
+                if matched:
+                    internship_count += 1
+
+        except Exception:
+            internship_count = 0
+
+    # -----------------------------------------
+    # DISPLAY DASHBOARD METRICS
+    # -----------------------------------------
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+
+        st.metric(
+            "Resume Score",
+            f"{score}%"
+        )
+
+    with col2:
+
+        st.metric(
+            "Career Readiness",
+            f"{readiness}%"
+        )
+
+    with col3:
+
+        st.metric(
+            "Internships",
+            internship_count
+        )
+
+    st.markdown("---")
+
+    # -----------------------------------------
+    # WELCOME MESSAGE
+    # -----------------------------------------
+
+    st.subheader("👋 Welcome to CareerAI")
+
+    if not resume_uploaded:
+
+        st.info(
+            "📄 Please upload your resume to start your CareerAI analysis."
+        )
+
+    else:
+
+        st.success(
+            "✅ Resume uploaded and analyzed successfully!"
+        )
+
+        st.write(
+            "Your dashboard has been updated based on your resume."
+        )
 
     elif page == "📄 Upload Resume":
 
