@@ -3,39 +3,99 @@ import PyPDF2
 import pandas as pd
 import re
 
-# ---------------- Page Configuration ----------------
+# =========================================================
+# PAGE CONFIGURATION
+# =========================================================
+
 st.set_page_config(
     page_title="CareerAI",
     page_icon="🎓",
     layout="wide"
 )
 
-# ---------------- Session State ----------------
+# =========================================================
+# SESSION STATE
+# =========================================================
+
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
-# ---------------- LOGIN PAGE ----------------
+if "email" not in st.session_state:
+    st.session_state.email = ""
+
+if "resume_text" not in st.session_state:
+    st.session_state.resume_text = ""
+
+if "found_skills" not in st.session_state:
+    st.session_state.found_skills = []
+
+if "resume_score" not in st.session_state:
+    st.session_state.resume_score = 0
+
+
+# =========================================================
+# SKILLS DATABASE
+# =========================================================
+
+SKILLS = [
+    "Python",
+    "Java",
+    "C",
+    "C++",
+    "HTML",
+    "CSS",
+    "JavaScript",
+    "SQL",
+    "Excel",
+    "React",
+    "Docker",
+    "AWS",
+    "Machine Learning",
+    "Communication",
+    "Git",
+    "Flask",
+    "Django",
+    "REST API",
+    "MongoDB",
+    "MySQL",
+    "Data Structures",
+    "Data Analysis"
+]
+
+
+# =========================================================
+# LOGIN PAGE
+# =========================================================
+
 if not st.session_state.logged_in:
 
     st.title("🎓 CareerAI")
-    st.subheader("AI Internship Recommendation Platform")
+    st.subheader(
+        "AI-Powered Resume, Job & Internship Career Platform"
+    )
 
     st.markdown("---")
 
     left, right = st.columns([2, 1])
 
     with left:
+
         st.header("Welcome to CareerAI")
+
         st.write("""
+        CareerAI helps students improve their career readiness.
+
         ✅ Build Professional Resume
 
-        ✅ AI Internship Recommendation
+        ✅ AI Resume Analysis
+
+        ✅ Job & Internship Matching
 
         ✅ Skill Gap Analysis
 
-        ✅ Career Roadmap
+        ✅ Personalized Career Roadmap
 
-        ✅ AI Interview Practice
+        ✅ Career Impact Analysis
 
         ✅ Career Readiness Score
         """)
@@ -45,420 +105,877 @@ if not st.session_state.logged_in:
         st.subheader("Login")
 
         email = st.text_input("Email")
-        password = st.text_input("Password", type="password")
 
-        if st.button("Login"):
+        password = st.text_input(
+            "Password",
+            type="password"
+        )
 
-           if "@" in email and "." in email and len(password) >= 4:
+        if st.button(
+            "Login",
+            key="login_button"
+        ):
 
-              st.session_state.logged_in = True
-              st.session_state.email = email
-              st.rerun()
+            if (
+                "@" in email
+                and "." in email
+                and len(password) >= 4
+            ):
 
-           else:
+                st.session_state.logged_in = True
+                st.session_state.email = email
 
-             st.error("Please enter a valid email and password.")
+                st.rerun()
 
-# ---------------- DASHBOARD ----------------
-# ---------------- DASHBOARD ----------------
+            else:
+
+                st.error(
+                    "Please enter a valid email and password."
+                )
+
+
+# =========================================================
+# MAIN APPLICATION
+# =========================================================
+
 else:
 
-    # Sidebar
+    # =====================================================
+    # SIDEBAR
+    # =====================================================
+
     st.sidebar.title("🎓 CareerAI")
+
+    st.sidebar.write(
+        f"Logged in as: {st.session_state.email}"
+    )
+
+    st.sidebar.markdown("---")
 
     page = st.sidebar.radio(
         "Navigation",
         [
-          "🏠 Dashboard",
-          "📄 Upload Resume",
-          "🤖 AI Recommendation",
-          "📈 Skill Gap",
-          "🛣 Career Roadmap",
-          "⭐ Career Impact",
-          "👤 Profile"
-      ]
+            "🏠 Dashboard",
+            "📄 Upload Resume",
+            "🤖 AI Recommendation",
+            "💼 Job Matcher",
+            "📈 Skill Gap",
+            "🛣 Career Roadmap",
+            "⭐ Career Impact",
+            "👤 Profile"
+        ]
     )
 
-    # Dashboard Page
-# =====================================================
-# DASHBOARD
-# =====================================================
 
-if page == "🏠 Dashboard":
+    # =====================================================
+    # DASHBOARD
+    # =====================================================
 
-    st.title("🏠 CareerAI Dashboard")
+    if page == "🏠 Dashboard":
 
-    # Check whether a resume has been uploaded
-    resume_uploaded = bool(
-        st.session_state.resume_text.strip()
-    )
+        st.title("🏠 CareerAI Dashboard")
 
-    # -----------------------------------------
-    # BEFORE RESUME UPLOAD
-    # -----------------------------------------
+        # Check whether resume is uploaded
+        resume_uploaded = bool(
+            st.session_state.resume_text.strip()
+        )
 
-    if not resume_uploaded:
+        # -----------------------------------------
+        # BEFORE RESUME UPLOAD
+        # -----------------------------------------
 
-        score = 0
-        readiness = 0
-        internship_count = 0
+        if not resume_uploaded:
 
-    # -----------------------------------------
-    # AFTER RESUME UPLOAD
-    # -----------------------------------------
-
-    else:
-
-        # Resume score calculated from uploaded resume
-        score = st.session_state.resume_score
-
-        # Career readiness based on resume score
-        if score >= 80:
-            readiness = 80
-        elif score >= 60:
-            readiness = 65
-        elif score > 0:
-            readiness = 45
-        else:
+            score = 0
             readiness = 0
-
-        # Count internships that match at least one skill
-        internship_count = 0
-
-        try:
-
-            data = pd.read_csv("internships.csv")
-
-            for _, row in data.iterrows():
-
-                required_skills = str(
-                    row["Skills"]
-                ).split(",")
-
-                required_skills = [
-                    skill.strip()
-                    for skill in required_skills
-                ]
-
-                matched = any(
-                    required.lower() == user_skill.lower()
-                    for required in required_skills
-                    for user_skill in st.session_state.found_skills
-                )
-
-                if matched:
-                    internship_count += 1
-
-        except Exception:
             internship_count = 0
 
-    # -----------------------------------------
-    # DISPLAY DASHBOARD METRICS
-    # -----------------------------------------
+        # -----------------------------------------
+        # AFTER RESUME UPLOAD
+        # -----------------------------------------
 
-    col1, col2, col3 = st.columns(3)
+        else:
 
-    with col1:
+            score = st.session_state.resume_score
 
-        st.metric(
-            "Resume Score",
-            f"{score}%"
-        )
+            # Career readiness
+            if score >= 80:
+                readiness = 80
 
-    with col2:
+            elif score >= 60:
+                readiness = 65
 
-        st.metric(
-            "Career Readiness",
-            f"{readiness}%"
-        )
+            elif score > 0:
+                readiness = 45
 
-    with col3:
+            else:
+                readiness = 0
 
-        st.metric(
-            "Internships",
-            internship_count
-        )
+            # Count suitable internships
+            internship_count = 0
 
-    st.markdown("---")
+            try:
 
-    # -----------------------------------------
-    # WELCOME MESSAGE
-    # -----------------------------------------
+                data = pd.read_csv(
+                    "internships.csv"
+                )
 
-    st.subheader("👋 Welcome to CareerAI")
+                for _, row in data.iterrows():
 
-    if not resume_uploaded:
+                    required_skills = str(
+                        row["Skills"]
+                    ).split(",")
 
-        st.info(
-            "📄 Please upload your resume to start your CareerAI analysis."
-        )
+                    required_skills = [
+                        skill.strip()
+                        for skill in required_skills
+                    ]
 
-    else:
+                    matched = any(
+                        required.lower()
+                        == user_skill.lower()
+                        for required in required_skills
+                        for user_skill in st.session_state.found_skills
+                    )
 
-        st.success(
-            "✅ Resume uploaded and analyzed successfully!"
-        )
+                    if matched:
+                        internship_count += 1
 
-        st.write(
-            "Your dashboard has been updated based on your resume."
-        )
+            except Exception:
+
+                internship_count = 0
+
+        # -----------------------------------------
+        # DASHBOARD METRICS
+        # -----------------------------------------
+
+        col1, col2, col3 = st.columns(3)
+
+        with col1:
+
+            st.metric(
+                "Resume Score",
+                f"{score}%"
+            )
+
+        with col2:
+
+            st.metric(
+                "Career Readiness",
+                f"{readiness}%"
+            )
+
+        with col3:
+
+            st.metric(
+                "Internships",
+                internship_count
+            )
+
+        st.markdown("---")
+
+        st.subheader("👋 Welcome to CareerAI")
+
+        if not resume_uploaded:
+
+            st.info(
+                "📄 Please upload your resume to start your CareerAI analysis."
+            )
+
+        else:
+
+            st.success(
+                "✅ Resume uploaded and analyzed successfully!"
+            )
+
+            st.write(
+                "Your dashboard has been updated based on your resume."
+            )
+
+
+    # =====================================================
+    # UPLOAD RESUME
+    # =====================================================
 
     elif page == "📄 Upload Resume":
 
-        st.title("📄 Upload Resume")
+        st.title("📄 Resume Upload & Analysis")
 
         uploaded_file = st.file_uploader(
-            "Choose Resume",
+            "Upload your resume",
             type=["pdf"]
         )
 
         if uploaded_file:
-            st.success("✅ Resume Uploaded Successfully!")
-            st.write("File Name:", uploaded_file.name)
+
+            st.success(
+                "✅ Resume uploaded successfully!"
+            )
+
+            st.write(
+                "File Name:",
+                uploaded_file.name
+            )
+
             st.write(
                 "File Size:",
-                round(uploaded_file.size/1024,2),
+                round(
+                    uploaded_file.size / 1024,
+                    2
+                ),
                 "KB"
             )
-            pdf_reader = PyPDF2.PdfReader(uploaded_file)
 
-            total_pages = len(pdf_reader.pages)
+            try:
 
-            st.write("Total Pages:", total_pages)
-            text = ""
+                pdf_reader = PyPDF2.PdfReader(
+                    uploaded_file
+                )
 
-            for page in pdf_reader.pages:
-              text += page.extract_text()
-            st.markdown("---")
+                total_pages = len(
+                    pdf_reader.pages
+                )
 
-            st.subheader("📄 Extracted Resume Text")
+                st.write(
+                    "Total Pages:",
+                    total_pages
+                )
 
-            st.write(text)
-            skills = [
-             "Python",
-             "Java",
-             "C",
-             "C++",
-             "HTML",
-             "CSS",
-             "JavaScript",
-             "SQL",
-             "React",
-             "Docker",
-             "AWS",
-             "Machine Learning",
-              "Communication",
-             "Git",
-             "Flask",
-             "Django"
-            ]
-            found_skills = []
-            for skill in skills:
+                text = ""
 
-             if skill.lower() in text.lower():
+                for page_data in pdf_reader.pages:
 
-              found_skills.append(skill)
-            st.session_state["found_skills"] = found_skills
-            st.markdown("---")
+                    page_text = page_data.extract_text()
 
-            st.subheader("✅ Skills Found")
+                    if page_text:
+                        text += page_text + "\n"
 
-            for skill in found_skills:
+                if not text.strip():
 
-             st.success(skill)
-            resume_score = len(found_skills) * 10
-            if resume_score > 100:
-              resume_score = 100
-            st.markdown("---")
+                    st.error(
+                        "❌ Could not extract text from this PDF."
+                    )
 
-            st.subheader("📊 Resume Score")
-            st.metric("Score", f"{resume_score}%")
-            st.progress(resume_score)
-            if resume_score >= 80:
-              st.success("Excellent Resume! 🎉")
+                    st.info(
+                        "Please upload a text-based PDF resume."
+                    )
 
-            elif resume_score >= 60:
-              st.info("Good Resume. Add a few more skills.")
+                else:
 
-            else:
-              st.warning("Your resume needs improvement.")
+                    # Save resume text
+                    st.session_state.resume_text = text
 
-        if uploaded_file: 
+                    # ---------------------------------
+                    # SKILL EXTRACTION
+                    # ---------------------------------
 
-         if st.button("Analyze Resume"):
+                    found_skills = []
 
-                st.subheader("Resume Analysis")
+                    for skill in SKILLS:
 
-                st.metric("Resume Score","82%")
+                        pattern = (
+                            r"\b"
+                            + re.escape(skill)
+                            + r"\b"
+                        )
 
-                st.progress(82)
+                        if re.search(
+                            pattern,
+                            text,
+                            re.IGNORECASE
+                        ):
 
-                st.write("### Skills Found")
+                            found_skills.append(skill)
 
-                st.write("✅ Python")
+                    st.session_state.found_skills = found_skills
 
-                st.write("✅ HTML")
+                    # ---------------------------------
+                    # RESUME SCORE
+                    # ---------------------------------
 
-                st.write("✅ CSS")
+                    score = min(
+                        len(found_skills) * 5,
+                        100
+                    )
 
-                st.write("✅ SQL")
+                    text_lower = text.lower()
 
-                st.write("✅ Communication")
+                    if "education" in text_lower:
+                        score += 5
 
+                    if "project" in text_lower:
+                        score += 5
+
+                    if "experience" in text_lower:
+                        score += 5
+
+                    if "certification" in text_lower:
+                        score += 5
+
+                    score = min(
+                        score,
+                        100
+                    )
+
+                    st.session_state.resume_score = score
+
+                    # ---------------------------------
+                    # EXTRACTED TEXT
+                    # ---------------------------------
+
+                    st.markdown("---")
+
+                    st.subheader(
+                        "📄 Extracted Resume Text"
+                    )
+
+                    with st.expander(
+                        "View Resume Text"
+                    ):
+
+                        st.text(text)
+
+                    # ---------------------------------
+                    # SKILLS
+                    # ---------------------------------
+
+                    st.markdown("---")
+
+                    st.subheader(
+                        "🧠 Skills Found"
+                    )
+
+                    if found_skills:
+
+                        cols = st.columns(3)
+
+                        for i, skill in enumerate(
+                            found_skills
+                        ):
+
+                            with cols[i % 3]:
+
+                                st.success(
+                                    f"✓ {skill}"
+                                )
+
+                    else:
+
+                        st.warning(
+                            "No predefined skills were detected."
+                        )
+
+                    # ---------------------------------
+                    # RESUME SCORE
+                    # ---------------------------------
+
+                    st.markdown("---")
+
+                    st.subheader(
+                        "📊 Resume Strength"
+                    )
+
+                    st.metric(
+                        "Resume Score",
+                        f"{score}%"
+                    )
+
+                    st.progress(score)
+
+                    if score >= 80:
+
+                        st.success(
+                            "Excellent Resume! 🎉"
+                        )
+
+                    elif score >= 60:
+
+                        st.info(
+                            "Good Resume. Some improvements are possible."
+                        )
+
+                    else:
+
+                        st.warning(
+                            "Your resume needs improvement."
+                        )
+
+                    st.markdown("---")
+
+                    st.success(
+                        "✅ Resume data saved. "
+                        "Go to Dashboard to see the updated score."
+                    )
+
+            except Exception as e:
+
+                st.error(
+                    f"Error reading PDF: {e}"
+                )
+
+
+    # =====================================================
+    # AI INTERNSHIP RECOMMENDATION
+    # =====================================================
 
     elif page == "🤖 AI Recommendation":
 
-        st.title("🤖 AI Internship Recommendation")
-        found_skills = st.session_state.get("found_skills", [])
+        st.title(
+            "🤖 AI Internship Recommendation"
+        )
+
+        found_skills = st.session_state.found_skills
+
         if not found_skills:
 
-         st.warning("⚠ Please upload your resume first.")
+            st.warning(
+                "⚠ Please upload your resume first."
+            )
 
-         st.stop()
-        data = pd.read_csv("internships.csv")
+            st.stop()
 
-        st.subheader("Available Internships")
+        try:
 
-        st.dataframe(data)
-        st.markdown("---")
+            data = pd.read_csv(
+                "internships.csv"
+            )
 
-        st.subheader("🎯 Recommended Internships")
-        for index, row in data.iterrows():
-               required_skills = row["Skills"]
-               match = 0
-               for skill in found_skills:
+        except FileNotFoundError:
 
-                if skill.lower() in required_skills.lower():
+            st.error(
+                "❌ internships.csv not found."
+            )
 
-                  match += 1
-        total_required = len(required_skills.split(","))
+            st.stop()
 
-        match_score = int((match / total_required) * 100)
-        if match_score >= 50:
+        except pd.errors.EmptyDataError:
 
-         st.write("###", row["Company"])
+            st.error(
+                "❌ internships.csv is empty."
+            )
 
-         st.write("Role:", row["Role"])
+            st.stop()
 
-         st.progress(match_score)
+        except Exception as e:
 
-         st.write("Match Score:", f"{match_score}%")
+            st.error(
+                f"Error reading internship data: {e}"
+            )
 
-         st.markdown("---")
-    elif page == "📈 Skill Gap":
+            st.stop()
 
-     st.title("📈 Skill Gap Analysis")
+        st.subheader(
+            "🎯 Recommended Internships"
+        )
 
-     found_skills = st.session_state.get("found_skills", [])
+        recommendations = []
 
-     if not found_skills:
+        for _, row in data.iterrows():
 
-        st.warning("⚠ Please upload your resume first.")
+            required_skills = str(
+                row["Skills"]
+            ).split(",")
 
-        st.stop()
+            required_skills = [
+                skill.strip()
+                for skill in required_skills
+            ]
 
-     data = pd.read_csv("internships.csv")
+            matched = []
 
-     st.subheader("Recommended Skill Improvements")
+            for required in required_skills:
 
-     for index, row in data.iterrows():
+                for user_skill in found_skills:
 
-        required_skills = row["Skills"].split(",")
+                    if (
+                        required.lower()
+                        == user_skill.lower()
+                    ):
 
-        have = []
+                        matched.append(required)
+                        break
 
-        missing = []
+            if required_skills:
 
-        for skill in required_skills:
-
-            skill = skill.strip()
-
-            if skill in found_skills:
-
-                have.append(skill)
+                match_score = int(
+                    (
+                        len(matched)
+                        / len(required_skills)
+                    ) * 100
+                )
 
             else:
 
-                missing.append(skill)
+                match_score = 0
 
-        st.markdown("---")
+            missing = [
+                skill
+                for skill in required_skills
+                if skill not in matched
+            ]
 
-        st.subheader(row["Company"])
+            recommendations.append(
+                {
+                    "Company": row["Company"],
+                    "Role": row["Role"],
+                    "Skills": row["Skills"],
+                    "Match": match_score,
+                    "Matched": matched,
+                    "Missing": missing
+                }
+            )
 
-        st.write("### ✅ Skills You Have")
-
-        for skill in have:
-            st.success(skill)
-
-        st.write("### ❌ Skills You Need")
-
-        for skill in missing:
-            st.error(skill)
-
-        if len(missing) == 0:
-            st.success("🎉 You already meet the skill requirements!")
-
-        else:
-            st.info("Learn the missing skills to improve your chances.")
-    
-
-         
-
-        st.title("🛣 Career Roadmap")
-
-        st.success("Week 1")
-
-        st.write("Learn HTML & CSS")
-
-        st.success("Week 2")
-
-        st.write("Learn Python")
-
-        st.success("Week 3")
-    
-        st.write("Learn SQL")
-
-        st.success("Week 4")
-
-        st.write("Learn React")
-
-        st.success("Week 5")
-
-        st.write("Build Full Stack Project")
-
-        st.success("Week 6")
-
-        st.write("Apply Internship")
-    elif page == "⭐ Career Impact":
-
-         st.title("⭐ Career Impact Simulator")
-
-         skill = st.selectbox(
-        "Select Skill",
-        [
-            "React",
-            "Docker",
-            "AWS",
-            "Machine Learning"
-        ]
+        # Sort recommendations
+        recommendations.sort(
+            key=lambda x: x["Match"],
+            reverse=True
         )
 
-         if st.button("Predict"):
+        for item in recommendations:
 
-           st.metric("Current Match","74%")
+            st.markdown("---")
 
-           st.metric("Future Match","91%")
+            st.subheader(
+                f"🏢 {item['Company']}"
+            )
 
-           st.success("12 More Internship Opportunities")
+            st.write(
+                "Role:",
+                item["Role"]
+            )
+
+            st.write(
+                "Required Skills:",
+                item["Skills"]
+            )
+
+            st.progress(
+                item["Match"]
+            )
+
+            st.write(
+                f"🎯 Match Score: {item['Match']}%"
+            )
+
+            if item["Matched"]:
+
+                st.write(
+                    "✅ Matched Skills:",
+                    ", ".join(
+                        item["Matched"]
+                    )
+                )
+
+            if item["Missing"]:
+
+                st.write(
+                    "❌ Missing Skills:",
+                    ", ".join(
+                        item["Missing"]
+                    )
+                )
+
+            else:
+
+                st.success(
+                    "🎉 You meet all listed skill requirements!"
+                )
+
+
+    # =====================================================
+    # JOB MATCHER
+    # =====================================================
+
+    elif page == "💼 Job Matcher":
+
+        st.title(
+            "💼 Job Matcher"
+        )
+
+        st.info(
+            "🚧 Advanced TF-IDF job matching will be added in the next stage."
+        )
+
+        st.write("""
+        Planned process:
+
+        Resume
+        ↓
+        Job Description
+        ↓
+        TF-IDF
+        ↓
+        Cosine Similarity
+        ↓
+        Job Match Score
+        """)
+
+
+    # =====================================================
+    # SKILL GAP
+    # =====================================================
+
+    elif page == "📈 Skill Gap":
+
+        st.title(
+            "📈 Skill Gap Analysis"
+        )
+
+        found_skills = st.session_state.found_skills
+
+        if not found_skills:
+
+            st.warning(
+                "⚠ Please upload your resume first."
+            )
+
+            st.stop()
+
+        try:
+
+            data = pd.read_csv(
+                "internships.csv"
+            )
+
+        except Exception as e:
+
+            st.error(
+                f"Could not load internship data: {e}"
+            )
+
+            st.stop()
+
+        st.subheader(
+            "🎯 Skill Requirements by Internship"
+        )
+
+        for _, row in data.iterrows():
+
+            required_skills = str(
+                row["Skills"]
+            ).split(",")
+
+            required_skills = [
+                skill.strip()
+                for skill in required_skills
+            ]
+
+            have = []
+            missing = []
+
+            for skill in required_skills:
+
+                found = any(
+                    skill.lower()
+                    == user_skill.lower()
+                    for user_skill in found_skills
+                )
+
+                if found:
+
+                    have.append(skill)
+
+                else:
+
+                    missing.append(skill)
+
+            st.markdown("---")
+
+            st.subheader(
+                f"🏢 {row['Company']} — {row['Role']}"
+            )
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+
+                st.write(
+                    "### ✅ Skills You Have"
+                )
+
+                if have:
+
+                    for skill in have:
+
+                        st.success(skill)
+
+                else:
+
+                    st.write(
+                        "No matching skills."
+                    )
+
+            with col2:
+
+                st.write(
+                    "### ❌ Skills You Need"
+                )
+
+                if missing:
+
+                    for skill in missing:
+
+                        st.error(skill)
+
+                else:
+
+                    st.success(
+                        "All required skills available!"
+                    )
+
+
+    # =====================================================
+    # CAREER ROADMAP
+    # =====================================================
+
+    elif page == "🛣 Career Roadmap":
+
+        st.title(
+            "🛣 Personalized Career Roadmap"
+        )
+
+        st.write(
+            "Your current roadmap prototype:"
+        )
+
+        roadmap = [
+            (
+                "Step 1",
+                "Learn HTML & CSS"
+            ),
+            (
+                "Step 2",
+                "Strengthen Python"
+            ),
+            (
+                "Step 3",
+                "Learn SQL"
+            ),
+            (
+                "Step 4",
+                "Learn Git & GitHub"
+            ),
+            (
+                "Step 5",
+                "Learn React"
+            ),
+            (
+                "Step 6",
+                "Build a Full-Stack Project"
+            ),
+            (
+                "Step 7",
+                "Apply for Internships"
+            )
+        ]
+
+        for step, description in roadmap:
+
+            st.success(
+                f"{step} → {description}"
+            )
+
+        st.info(
+            "🤖 Personalized LLM-generated roadmap "
+            "with real course recommendations will be added next."
+        )
+
+
+    # =====================================================
+    # CAREER IMPACT
+    # =====================================================
+
+    elif page == "⭐ Career Impact":
+
+        st.title(
+            "⭐ Career Impact Simulator"
+        )
+
+        skill = st.selectbox(
+            "Select a skill you want to learn",
+            [
+                "React",
+                "Docker",
+                "AWS",
+                "Machine Learning",
+                "REST API"
+            ]
+        )
+
+        if st.button(
+            "Analyze Career Impact",
+            key="career_impact_button"
+        ):
+
+            current_score = (
+                st.session_state.resume_score
+            )
+
+            future_score = min(
+                current_score + 10,
+                100
+            )
+
+            st.metric(
+                "Current Resume Score",
+                f"{current_score}%"
+            )
+
+            st.metric(
+                f"Future Score with {skill}",
+                f"{future_score}%"
+            )
+
+            st.success(
+                f"Learning {skill} can strengthen your profile."
+            )
+
+
+    # =====================================================
+    # PROFILE
+    # =====================================================
 
     elif page == "👤 Profile":
 
-        st.title("👤 Student Profile")
+        st.title(
+            "👤 Student Profile"
+        )
 
-        st.write("Name: Suthiksha")
-        st.write("Resume Score: 82%")
-        st.write("Career Readiness: 74%")
+        st.write(
+            "Email:",
+            st.session_state.email
+        )
 
-        if st.button("Logout"):
+        st.write(
+            "Resume Score:",
+            f"{st.session_state.resume_score}%"
+        )
+
+        st.write(
+            "Skills Found:",
+            len(st.session_state.found_skills)
+        )
+
+        if st.session_state.found_skills:
+
+            st.write(
+                "Skills:",
+                ", ".join(
+                    st.session_state.found_skills
+                )
+            )
+
+        st.markdown("---")
+
+        if st.button(
+            "Logout",
+            key="logout_button"
+        ):
+
             st.session_state.logged_in = False
+            st.session_state.email = ""
+            st.session_state.resume_text = ""
+            st.session_state.found_skills = []
+            st.session_state.resume_score = 0
+
             st.rerun()
