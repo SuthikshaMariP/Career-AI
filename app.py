@@ -20,7 +20,22 @@ st.set_page_config(
 # OLLAMA
 # =========================================================
 
-OLLAMA_MODEL = "llama3.2:3b"
+# If an Ollama API key is available in Streamlit Secrets, use
+# Ollama Cloud. Otherwise, keep using the local Ollama server.
+try:
+    OLLAMA_API_KEY = st.secrets.get("OLLAMA_API_KEY", "")
+except Exception:
+    OLLAMA_API_KEY = ""
+
+if OLLAMA_API_KEY:
+    OLLAMA_MODEL = "gpt-oss:20b-cloud"
+    ollama_client = ollama.Client(
+        host="https://ollama.com",
+        headers={"Authorization": f"Bearer {OLLAMA_API_KEY}"}
+    )
+else:
+    OLLAMA_MODEL = "llama3.2:3b"
+    ollama_client = ollama.Client(host="http://localhost:11434")
 
 
 # =========================================================
@@ -1146,7 +1161,7 @@ projects, marks, certifications or skills.
 
                 try:
 
-                    response = ollama.chat(
+                    response = ollama_client.chat(
                         model=OLLAMA_MODEL,
                         messages=[
                             {
@@ -2469,7 +2484,7 @@ Use headings and bullet points. Keep explanations concise and actionable.
 
                     try:
 
-                        response = ollama.chat(
+                        response = ollama_client.chat(
                             model=OLLAMA_MODEL,
                             messages=[
                                 {
