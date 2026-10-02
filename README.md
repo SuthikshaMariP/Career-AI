@@ -14,7 +14,7 @@ AI-Powered Resume Analyzer and Internship Recommendation System.
 
 ## Technologies Used
 
-- Python
-- Streamlit
-- Pandas
-- PyPDF2
+streamlit
+PyPDF2
+pandas
+ollama
