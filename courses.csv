@@ -1,0 +1,25 @@
+Course,Platform,Skill,Career,Level,Duration,Study_Hours_Per_Week,Link,Cost
+Programming for Everybody (Getting Started with Python),Coursera,Python,Python Developer,Beginner,2 weeks,10,https://www.coursera.org/learn/python,Free/Paid
+Python for Everybody,Coursera,Python,Python Developer,Beginner,2-6 months,10,https://www.coursera.org/specializations/python,Free/Paid
+CS50's Introduction to Computer Science,edX,C Programming,Software Engineer,Beginner,12 weeks,6-18,https://www.edx.org/learn/computer-science/harvard-university-cs50-s-introduction-to-computer-science,Free/Paid
+CS50's Introduction to Python,edX,Python,Python Developer,Beginner,10 weeks,6-10,https://www.edx.org/,Free/Paid
+Responsive Web Design,freeCodeCamp,HTML CSS,Web Developer,Beginner,Self-paced,5,https://www.freecodecamp.org/learn/2022/responsive-web-design/,Free
+JavaScript Algorithms and Data Structures,freeCodeCamp,JavaScript,Web Developer,Intermediate,Self-paced,6,https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/,Free
+Python Fundamentals,Microsoft Learn,Python,Python Developer,Beginner,3 hr 12 min,4,https://learn.microsoft.com/en-us/training/paths/get-started-with-python-fundamentals/,Free
+Azure Fundamentals,Microsoft Learn,Cloud Computing,Cloud Engineer,Beginner,Self-paced,5,https://learn.microsoft.com/en-us/training/azure/,Free
+Azure Cloud Concepts,Microsoft Learn,Azure,Cloud Engineer,Beginner,56 min,4,https://learn.microsoft.com/en-us/learn/paths/azure-fundamentals/,Free
+Google Cloud Fundamentals,Google Skills,Cloud Computing,Cloud Engineer,Beginner,Self-paced,5,https://www.cloudskillsboost.google/,Free/Paid
+AWS Cloud Practitioner,AWS Skill Builder,AWS,Cloud Engineer,Beginner,Self-paced,5,https://skillbuilder.aws/,Free/Paid
+AI Fundamentals,IBM SkillsBuild,Artificial Intelligence,AI Engineer,Intermediate,Self-paced,5,https://skillsbuild.org/,Free
+Introduction to Cybersecurity,Cisco Networking Academy,Cybersecurity,Cybersecurity Engineer,Beginner,Self-paced,5,https://www.netacad.com/,Free
+Java Programming,Oracle University,Java,Java Developer,Beginner,Self-paced,6,https://education.oracle.com/,Free/Paid
+Design and Analysis of Algorithms,NPTEL,Algorithms,Software Engineer,Intermediate,12 weeks,6,https://www.nptel.ac.in/,Free/Paid
+Python for Data Science,Great Learning,Python Data Science,Data Analyst,Beginner,Self-paced,6,https://www.mygreatlearning.com/,Free/Paid
+Data Science with Python,Simplilearn,Python Data Science,Data Scientist,Beginner,Self-paced,6,https://www.simplilearn.com/,Free/Paid
+Python Programming,DataCamp,Python,Data Analyst,Beginner,Self-paced,5,https://www.datacamp.com/,Free/Paid
+SQL Fundamentals,DataCamp,SQL,Data Analyst,Beginner,Self-paced,5,https://www.datacamp.com/,Free/Paid
+Python Programming,Pluralsight,Python,Python Developer,Beginner,Self-paced,5,https://www.pluralsight.com/,Paid
+Computer Science Fundamentals,Khan Academy,Computer Science,Software Engineer,Beginner,Self-paced,5,https://www.khanacademy.org/computing,Free
+Introduction to Computer Science,MIT OpenCourseWare,Computer Science,Software Engineer,Beginner,Self-paced,8,https://ocw.mit.edu/,Free
+Introduction to Programming,Udemy,Programming,Software Engineer,Beginner,Self-paced,6,https://www.udemy.com/,Paid
+The Complete Python Course,Udemy,Python,Python Developer,Beginner,Self-paced,8,https://www.udemy.com/,Paid
