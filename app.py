@@ -2737,6 +2737,109 @@ Use headings and bullet points. Keep explanations concise and actionable.
 
 
 
+    # =====================================================
+    # PROFILE
+    # =====================================================
+
+    elif page == "👤 Profile":
+
+        st.markdown(
+            '<div class="cai-pagehead"><div><div class="title">Your Profile</div><div class="desc">View your CareerAI account, resume progress and detected career information.</div></div><div class="cai-pill">Career Profile</div></div>',
+            unsafe_allow_html=True
+        )
+
+        # Account information
+        st.markdown('<div class="cai-section"><h3>👤 Account</h3></div>', unsafe_allow_html=True)
+        c1, c2 = st.columns(2, gap="large")
+
+        with c1:
+            st.markdown(
+                f'<div class="cai-card"><div class="cai-card-title">Email</div><div style="margin-top:.6rem;font-size:1.05rem;font-weight:700;color:#172033;">{st.session_state.email}</div></div>',
+                unsafe_allow_html=True
+            )
+
+        with c2:
+            st.markdown(
+                f'<div class="cai-card"><div class="cai-card-title">Resume Status</div><div style="margin-top:.6rem;font-size:1.05rem;font-weight:700;color:#172033;">{"Uploaded ✓" if st.session_state.resume_text else "Not uploaded yet"}</div></div>',
+                unsafe_allow_html=True
+            )
+
+        # Career summary
+        st.markdown('<div class="cai-section"><h3>📊 Career Summary</h3></div>', unsafe_allow_html=True)
+
+        p1, p2, p3, p4 = st.columns(4, gap="medium")
+
+        with p1:
+            st.metric("Resume Score", f"{st.session_state.resume_score}%")
+        with p2:
+            st.metric("Skills Detected", len(st.session_state.found_skills))
+        with p3:
+            st.metric("Education", len(st.session_state.found_degrees))
+        with p4:
+            st.metric("AI Analysis", "Ready ✓" if st.session_state.ai_resume_analysis else "Pending")
+
+        # Detected skills
+        st.markdown('<div class="cai-section"><h3>💻 Technical Skills</h3></div>', unsafe_allow_html=True)
+
+        if st.session_state.found_skills:
+            skills_html = "".join(
+                f'<span class="cai-pill">{skill}</span>'
+                for skill in st.session_state.found_skills
+            )
+            st.markdown(
+                f'<div class="cai-card">{skills_html}</div>',
+                unsafe_allow_html=True
+            )
+        else:
+            st.info("Upload a resume to detect your technical skills.")
+
+        # Education
+        st.markdown('<div class="cai-section"><h3>🎓 Education</h3></div>', unsafe_allow_html=True)
+
+        if st.session_state.found_degrees:
+            st.markdown(
+                '<div class="cai-card">' +
+                "".join(f'<div style="padding:.35rem 0;font-weight:600;color:#172033;">🎓 {degree}</div>' for degree in st.session_state.found_degrees) +
+                '</div>',
+                unsafe_allow_html=True
+            )
+        else:
+            st.info("Education details will appear here after resume analysis.")
+
+        # Workflow status
+        st.markdown('<div class="cai-section"><h3>🚀 CareerAI Progress</h3></div>', unsafe_allow_html=True)
+
+        progress_items = [
+            ("Resume uploaded", bool(st.session_state.resume_text)),
+            ("Skills detected", bool(st.session_state.found_skills)),
+            ("AI resume analysis", bool(st.session_state.ai_resume_analysis)),
+            ("Career roadmap", bool(st.session_state.career_roadmap)),
+        ]
+
+        for label, completed in progress_items:
+            status = "✓ Complete" if completed else "○ Pending"
+            status_color = "#16a34a" if completed else "#94a3b8"
+            st.markdown(
+                f'<div class="cai-step"><strong>{"✓" if completed else "○"} {label}</strong><span style="float:right;color:{status_color};font-size:.82rem;">{status}</span></div>',
+                unsafe_allow_html=True
+            )
+
+        # Logout
+        st.markdown('<div class="cai-section"><h3>🔐 Account Actions</h3></div>', unsafe_allow_html=True)
+
+        if st.button("🚪 Logout", type="secondary", use_container_width=True):
+            st.session_state.logged_in = False
+            st.session_state.email = ""
+            st.session_state.resume_text = ""
+            st.session_state.found_skills = []
+            st.session_state.found_degrees = []
+            st.session_state.resume_score = 0
+            st.session_state.ai_resume_analysis = ""
+            st.session_state.ai_resume_context = ""
+            st.session_state.career_roadmap = ""
+            st.rerun()
+
+
 # =========================================================
 # CAREERAI FOOTER
 # =========================================================
