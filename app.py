@@ -53,7 +53,9 @@ st.markdown("""
 .stApp{background:var(--bg);font-family:'Inter',sans-serif;color:var(--ink)}
 [data-testid="stAppViewContainer"]{background:radial-gradient(circle at 85% 0%,rgba(99,102,241,.08),transparent 25%),linear-gradient(180deg,#f8faff 0%,#f4f7fb 100%)}
 .block-container{max-width:1500px;padding:1.8rem 2.4rem 4rem}
-#MainMenu,footer,header{visibility:hidden}
+#MainMenu,footer{visibility:hidden}
+[data-testid="stHeader"]{background:transparent}
+[data-testid="stToolbar"]{visibility:hidden}
 h1{font-weight:800!important;letter-spacing:-1.7px!important;color:#0b1220!important}
 h2,h3{font-weight:750!important;letter-spacing:-.55px!important;color:#111827!important}
 p,label{color:#475569}
@@ -2845,3 +2847,4 @@ Use headings and bullet points. Keep explanations concise and actionable.
 # =========================================================
 if st.session_state.get("logged_in", False):
     st.markdown("<div style='text-align:center;color:#94a3b8;font-size:.76rem;margin-top:2.5rem;padding-top:1rem;border-top:1px solid #e5eaf3;'>CareerAI • AI Career Intelligence Platform • Built with Streamlit + Ollama</div>", unsafe_allow_html=True)
+
