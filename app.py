@@ -12,7 +12,8 @@ import ollama
 st.set_page_config(
     page_title="CareerAI",
     page_icon="🎓",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 
@@ -54,8 +55,26 @@ st.markdown("""
 [data-testid="stAppViewContainer"]{background:radial-gradient(circle at 85% 0%,rgba(99,102,241,.08),transparent 25%),linear-gradient(180deg,#f8faff 0%,#f4f7fb 100%)}
 .block-container{max-width:1500px;padding:1.8rem 2.4rem 4rem}
 #MainMenu,footer{visibility:hidden}
-[data-testid="stHeader"]{background:transparent}
-[data-testid="stToolbar"]{visibility:hidden}
+/* Keep Streamlit header visible so the sidebar toggle works on laptop and mobile */
+[data-testid="stHeader"]{
+    visibility:visible !important;
+    display:flex !important;
+    background:transparent !important;
+    height:2.75rem !important;
+}
+/* Keep the header/sidebar toggle visible */
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapsedControl"]{
+    visibility:visible !important;
+    display:flex !important;
+    opacity:1 !important;
+    z-index:999999 !important;
+}
+/* Do not hide Streamlit's header buttons */
+[data-testid="stHeader"] button{
+    visibility:visible !important;
+}
+
 h1{font-weight:800!important;letter-spacing:-1.7px!important;color:#0b1220!important}
 h2,h3{font-weight:750!important;letter-spacing:-.55px!important;color:#111827!important}
 p,label{color:#475569}
@@ -71,6 +90,75 @@ p,label{color:#475569}
 [data-testid="stSidebar"] .stRadio [role="radiogroup"] label:has(input:checked){background:linear-gradient(90deg,#eef2ff,#f0f9ff);color:#3730a3!important;border-color:#cfd8ff;box-shadow:inset 3px 0 0 #6366f1}
 [data-testid="stSidebar"] .stRadio [role="radiogroup"] label p{color:inherit!important;font-weight:600}
 [data-testid="stSidebar"] .stButton button{width:100%;background:#fff!important;color:#334155!important;border:1px solid #dbe4f2!important;border-radius:12px!important}
+
+
+/* =========================================================
+   CAREERAI SIDEBAR - ALWAYS VISIBLE
+   Keep the navigation visible on both desktop and mobile.
+   On phones it overlays the left side instead of disappearing.
+   ========================================================= */
+
+/* Desktop */
+[data-testid="stSidebar"]{
+    visibility:visible !important;
+    display:block !important;
+    opacity:1 !important;
+}
+
+/* Make the sidebar remain visible even when Streamlit marks it collapsed */
+[data-testid="stSidebar"][aria-expanded="false"],
+[data-testid="stSidebar"][data-collapsed="true"]{
+    visibility:visible !important;
+    display:block !important;
+    transform:translateX(0) !important;
+    width:280px !important;
+    min-width:280px !important;
+}
+
+/* Mobile: keep the complete navigation visible */
+@media (max-width: 768px){
+    [data-testid="stSidebar"]{
+        visibility:visible !important;
+        display:block !important;
+        opacity:1 !important;
+        position:fixed !important;
+        left:0 !important;
+        top:0 !important;
+        bottom:0 !important;
+        width:270px !important;
+        min-width:270px !important;
+        max-width:270px !important;
+        transform:translateX(0) !important;
+        z-index:100000 !important;
+        overflow-y:auto !important;
+        box-shadow:8px 0 30px rgba(15,23,42,.16) !important;
+    }
+
+    /* Prevent Streamlit's collapsed state from hiding it */
+    [data-testid="stSidebar"][aria-expanded="false"]{
+        transform:translateX(0) !important;
+        visibility:visible !important;
+        display:block !important;
+    }
+
+    /* Give the page room so sidebar doesn't cover the whole phone */
+    [data-testid="stAppViewContainer"]{
+        margin-left:270px !important;
+    }
+
+    .block-container{
+        padding-left:1rem !important;
+        padding-right:1rem !important;
+    }
+
+    /* Keep the sidebar controls visible */
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="stSidebarCollapsedControl"]{
+        visibility:visible !important;
+        display:flex !important;
+        opacity:1 !important;
+    }
+}
 
 /* CONTROLS */
 .stButton>button,.stLinkButton>a{border-radius:12px!important;font-weight:700!important;min-height:45px;border:1px solid #d9e2ef!important;transition:.2s ease;box-shadow:0 3px 8px rgba(15,23,42,.03)}
@@ -2847,4 +2935,3 @@ Use headings and bullet points. Keep explanations concise and actionable.
 # =========================================================
 if st.session_state.get("logged_in", False):
     st.markdown("<div style='text-align:center;color:#94a3b8;font-size:.76rem;margin-top:2.5rem;padding-top:1rem;border-top:1px solid #e5eaf3;'>CareerAI • AI Career Intelligence Platform • Built with Streamlit + Ollama</div>", unsafe_allow_html=True)
-
